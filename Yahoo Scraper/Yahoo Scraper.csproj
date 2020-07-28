@@ -1,8 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Yahoo_Scraper</RootNamespace>
+    <Authors>Michael Konoplyan</Authors>
+    <Description>Simply scrapes Yahoo's Optionchain API</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/MichaelKono/Yahoo-Scraper</RepositoryUrl>
+    <PackageTags>Yahoo, API, Stocks, Options, OptionChains, Scraper, Stock</PackageTags>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>

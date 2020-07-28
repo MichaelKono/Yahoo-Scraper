@@ -4,19 +4,19 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace Yahoo_Scraper
+namespace StockScraping
 {
     // All of these classes hold returned data
-    class YahooResponse
+    public class YahooResponse
     {
         public OptionChainResult OptionChain { get; set; }
     }
-    class OptionChainResult
+    public class OptionChainResult
     {
         public List<OptionChainCollection> Result { get; set; }
     }
 
-    class OptionChainCollection
+    public class OptionChainCollection
     {
         public string UnderlyingSymbol { get; set; }
         public UnderlyingQuote Quote { get; set; }
@@ -26,7 +26,7 @@ namespace Yahoo_Scraper
         public List<OptionChain> Options { get; set; }
     }
 
-    class UnderlyingQuote
+    public class UnderlyingQuote
     {
         public long DividendDate { get; set; }
         public long EarningsTimestamp { get; set; }
@@ -43,14 +43,14 @@ namespace Yahoo_Scraper
         public string MarketState { get; set; }
     }
 
-    class OptionChain
+    public class OptionChain
     {
         public long ExpirationDate { get; set; }
         public List<Option> Calls { get; set; }
         public List<Option> Puts { get; set; }
     }
 
-    class Option
+    public class Option
     {
         public string ContractSymbol { get; set; }
         public decimal Strike { get; set; }
@@ -67,13 +67,13 @@ namespace Yahoo_Scraper
         public long Expiration { get; set; }
     }
 
-    class Program
+    public class YahooScrape
     {
 
         const string _Y_API = "https://query2.finance.yahoo.com/v7/finance/options/"; // The API we access to scrape, we add the callsign to the end of this string when scraping
 
         // Attempts to find Cached scrapes, otherwise initilizes API request
-        public static bool TryGetFromCache(string filename, string fileLocation, TimeSpan expiration, out string data)
+        private static bool TryGetFromCache(string filename, string fileLocation, TimeSpan expiration, out string data)
         {
             string path = Path.Combine(fileLocation, filename);
 
@@ -88,7 +88,7 @@ namespace Yahoo_Scraper
         }
 
         // This saves the scrape localy if TryGetFromCache Fails
-        public static void SaveToCache(string filename, string fileLocation, string data)
+        private static void SaveToCache(string filename, string fileLocation, string data)
         {
             string path = Path.Combine(fileLocation, filename);
             Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -96,7 +96,7 @@ namespace Yahoo_Scraper
         }
 
         // This actully makes the Http request and scrapes the data
-        public static string HttpGet(string symbol, string fileLocation, TimeSpan cacheExpiration, long expirationDate = 0)
+        private static string HttpGet(string symbol, string fileLocation, TimeSpan cacheExpiration, long expirationDate = 0)
         {
             string url = $"{_Y_API}{symbol}";
             string fileName = $"{symbol}\\{symbol}.json";
@@ -120,7 +120,7 @@ namespace Yahoo_Scraper
             return data;
         }
 
-        private static OptionChainCollection GetOptionChainCollection(string symbol, string fileLocation, TimeSpan cacheExpiration)
+        public static OptionChainCollection GetOptionChainCollection(string symbol, string fileLocation, TimeSpan cacheExpiration)
         {
             // Here you can change the deserialization of the returned data, for now we remove case sensitivity
             var options = new JsonSerializerOptions
@@ -147,11 +147,5 @@ namespace Yahoo_Scraper
             return response.OptionChain.Result[0];
         }
 
-        // https://www.ally.com/do-it-right/banking/how-is-annual-percentage-yield-calculated/
-        // EFFECT in excel
-        private static double GetCompoundedRate(double r, double n)
-        {
-            return Math.Pow(1.0 + r / n, n) - 1.0;
-        }
     }
 }
