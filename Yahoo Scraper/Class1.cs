@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -88,15 +89,15 @@ namespace StockScraping
         }
 
         // This saves the scrape localy if TryGetFromCache Fails
-        private static void SaveToCache(string filename, string fileLocation, string data)
+        private static void SaveToCache(string filename, string cacheLocation, string data)
         {
-            string path = Path.Combine(fileLocation, filename);
+            string path = Path.Combine(cacheLocation, filename);
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllText(path, data);
         }
 
         // This actully makes the Http request and scrapes the data
-        private static string HttpGet(string symbol, string fileLocation, TimeSpan cacheExpiration, long expirationDate = 0)
+        private static string HttpGet(string symbol, string cacheLocation, TimeSpan cacheExpiration, long expirationDate = 0)
         {
             string url = $"{_Y_API}{symbol}";
             string fileName = $"{symbol}\\{symbol}.json";
@@ -109,18 +110,18 @@ namespace StockScraping
 
             string data;
 
-            if (TryGetFromCache(fileName, fileLocation, cacheExpiration, out data))
+            if (TryGetFromCache(fileName, cacheLocation, cacheExpiration, out data))
                 return data;
 
             var client = new HttpClient();
             data = client.GetStringAsync(url).Result;
 
-            SaveToCache(fileName, fileLocation, data);
+            SaveToCache(fileName, cacheLocation, data);
             // Data = the scraped information in raw Json, we will filter this out later in order to display in a readable format
             return data;
         }
 
-        public static OptionChainCollection GetOptionChainCollection(string symbol, string fileLocation, TimeSpan cacheExpiration)
+        public static OptionChainCollection GetOptionChainCollection(string symbol, string cacheLocation, TimeSpan cacheExpiration)
         {
             // Here you can change the deserialization of the returned data, for now we remove case sensitivity
             var options = new JsonSerializerOptions
@@ -131,7 +132,7 @@ namespace StockScraping
             //options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
             // Here is where most of our methods would be called once GetOptionChainCollection is initilized. This is also where all our classes created at the top also get populated with the folowing values
-            string jsonString = HttpGet(symbol, fileLocation, cacheExpiration);
+            string jsonString = HttpGet(symbol, cacheLocation, cacheExpiration);
 
             var response = JsonSerializer.Deserialize<YahooResponse>(jsonString, options);
 
@@ -139,7 +140,7 @@ namespace StockScraping
 
             foreach (long expirationDate in response.OptionChain.Result[0].ExpirationDates)
             {
-                jsonString = HttpGet(symbol, fileLocation, cacheExpiration, expirationDate);
+                jsonString = HttpGet(symbol, cacheLocation, cacheExpiration, expirationDate);
                 var chain = JsonSerializer.Deserialize<YahooResponse>(jsonString, options);
                 response.OptionChain.Result[0].Options.AddRange(chain.OptionChain.Result[0].Options);
             }
