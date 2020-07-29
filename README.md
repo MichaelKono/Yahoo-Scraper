@@ -1,13 +1,9 @@
 # Yahoo-Scraper
-A simple Yahoo Scraping library
 
 Simple Yahoo optionchain scraper.
-
 Scrapes Yahoo's stock API for option data, data can be cached for specified amount of time in order to keep your IP from being blocked from Yahoo's API.
 
-
 Utilization - 
-
 
 Create an instance of the OptionChainCollection class, here is an example.
 ```c#
