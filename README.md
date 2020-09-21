@@ -23,8 +23,9 @@ foreach (OptionChain optionChain in response.Options)
                 foreach (Option put in optionChain.Puts) // Reminder you can access both Puts and Calls separately.
                 {
                     if (put.Volume < minVolume) // Here is an example on filtering out the specified option to display.
-                        continue;
+                        Break;
                         
                     results.Add((put));
                 }
+            }
 ```
